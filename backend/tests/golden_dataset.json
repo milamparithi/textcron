@@ -1,0 +1,487 @@
+[
+  {
+    "name": "empty input",
+    "text": "",
+    "mock": null,
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "cannot be empty"
+        }
+      ]
+    }
+  },
+  {
+    "name": "whitespace only",
+    "text": "   ",
+    "mock": null,
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "cannot be empty"
+        }
+      ]
+    }
+  },
+  {
+    "name": "too long (>500 chars)",
+    "text": "every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every every ",
+    "mock": null,
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "too long"
+        }
+      ]
+    }
+  },
+  {
+    "name": "disallowed characters",
+    "text": "<script>alert(1)</script> on Monday",
+    "mock": null,
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "disallowed characters"
+        }
+      ]
+    }
+  },
+  {
+    "name": "no time keyword",
+    "text": "hello world foo bar",
+    "mock": null,
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "does not describe a schedule"
+        }
+      ]
+    }
+  },
+  {
+    "name": "gibberish repetitive",
+    "text": "every aaaaaaaa",
+    "mock": null,
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "gibberish"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM returns error impossible date",
+    "text": "on February 30",
+    "mock": {
+      "error": "February never has 30 days"
+    },
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "February never has 30 days"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM returns error invalid interval",
+    "text": "every 0 minutes",
+    "mock": {
+      "error": "Interval of 0 minutes is invalid"
+    },
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "Interval of 0 minutes"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM returns error unsupported concept",
+    "text": "every fortnight",
+    "mock": {
+      "error": "Fortnightly schedules are not supported"
+    },
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "not supported"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM returns error ambiguity",
+    "text": "every second day",
+    "mock": {
+      "error": "Ambiguous: every second day could mean every 2 days or on the 2nd"
+    },
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "Ambiguous"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM system error missing fields",
+    "text": "every day at noon",
+    "mock": {
+      "minute": "0",
+      "explanation": "test"
+    },
+    "expected": {
+      "status": 502,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "missing fields"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM system error out of range minute",
+    "text": "every day at 99 past the hour",
+    "mock": {
+      "minute": "99",
+      "hour": "*",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "*",
+      "explanation": "test"
+    },
+    "expected": {
+      "status": 502,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "Value out of range"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM system error out of range month",
+    "text": "monthly on the 13th",
+    "mock": {
+      "minute": "0",
+      "hour": "0",
+      "day_of_month": "13",
+      "month": "13",
+      "day_of_week": "*",
+      "explanation": "test"
+    },
+    "expected": {
+      "status": 502,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "Value out of range"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM system error invalid cron syntax",
+    "text": "daily at unknown time",
+    "mock": {
+      "minute": "abc",
+      "hour": "*",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "*",
+      "explanation": "test"
+    },
+    "expected": {
+      "status": 502,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "Invalid cron syntax"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM system error missing explanation",
+    "text": "daily schedule",
+    "mock": {
+      "minute": "0",
+      "hour": "*",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "*",
+      "explanation": ""
+    },
+    "expected": {
+      "status": 502,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "Explanation is missing"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM system error explanation too long",
+    "text": "daily",
+    "mock": {
+      "minute": "0",
+      "hour": "*",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "*",
+      "explanation": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "expected": {
+      "status": 502,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "Explanation is missing"
+        }
+      ]
+    }
+  },
+  {
+    "name": "LLM throws exception",
+    "text": "every day",
+    "mock": null,
+    "mock_raises": true,
+    "expected": {
+      "status": 400,
+      "checks": [
+        {
+          "type": "detail_contains",
+          "value": "Unable to parse schedule"
+        }
+      ]
+    }
+  },
+  {
+    "name": "basic weekday schedule",
+    "text": "every weekday at 3pm",
+    "mock": {
+      "minute": "0",
+      "hour": "15",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "1-5",
+      "explanation": "At 3:00 PM, Monday through Friday"
+    },
+    "expected": {
+      "status": 200,
+      "checks": [
+        {
+          "type": "cron",
+          "value": "0 15 * * 1-5"
+        },
+        {
+          "type": "warning",
+          "value": ""
+        }
+      ]
+    }
+  },
+  {
+    "name": "every N minutes",
+    "text": "every 5 minutes",
+    "mock": {
+      "minute": "*/5",
+      "hour": "*",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "*",
+      "explanation": "Every 5 minutes"
+    },
+    "expected": {
+      "status": 200,
+      "checks": [
+        {
+          "type": "cron",
+          "value": "*/5 * * * *"
+        },
+        {
+          "type": "warning",
+          "value": ""
+        }
+      ]
+    }
+  },
+  {
+    "name": "weekly on Sunday at 8am",
+    "text": "every Sunday at 8am",
+    "mock": {
+      "minute": "0",
+      "hour": "8",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "0",
+      "explanation": "At 8:00 AM, on Sunday"
+    },
+    "expected": {
+      "status": 200,
+      "checks": [
+        {
+          "type": "cron",
+          "value": "0 8 * * 0"
+        },
+        {
+          "type": "warning",
+          "value": ""
+        }
+      ]
+    }
+  },
+  {
+    "name": "midnight on 1st of month",
+    "text": "at midnight on the first of every month",
+    "mock": {
+      "minute": "0",
+      "hour": "0",
+      "day_of_month": "1",
+      "month": "*",
+      "day_of_week": "*",
+      "explanation": "At midnight, on day 1 of the month"
+    },
+    "expected": {
+      "status": 200,
+      "checks": [
+        {
+          "type": "cron",
+          "value": "0 0 1 * *"
+        },
+        {
+          "type": "warning",
+          "value": ""
+        }
+      ]
+    }
+  },
+  {
+    "name": "every 2 hours no warning",
+    "text": "every 2 hours",
+    "mock": {
+      "minute": "0",
+      "hour": "*/2",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "*",
+      "explanation": "Every 2 hours"
+    },
+    "expected": {
+      "status": 200,
+      "checks": [
+        {
+          "type": "cron",
+          "value": "0 */2 * * *"
+        },
+        {
+          "type": "warning",
+          "value": ""
+        }
+      ]
+    }
+  },
+  {
+    "name": "every minute warns",
+    "text": "every minute",
+    "mock": {
+      "minute": "*",
+      "hour": "*",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "*",
+      "explanation": "Every minute"
+    },
+    "expected": {
+      "status": 200,
+      "checks": [
+        {
+          "type": "cron",
+          "value": "* * * * *"
+        },
+        {
+          "type": "warning_contains",
+          "value": "1 minute"
+        }
+      ]
+    }
+  },
+  {
+    "name": "every 3 minutes warns",
+    "text": "every 3 minutes",
+    "mock": {
+      "minute": "*/3",
+      "hour": "*",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "*",
+      "explanation": "Every 3 minutes"
+    },
+    "expected": {
+      "status": 200,
+      "checks": [
+        {
+          "type": "cron",
+          "value": "*/3 * * * *"
+        },
+        {
+          "type": "warning_contains",
+          "value": "3 minute"
+        }
+      ]
+    }
+  },
+  {
+    "name": "weekends at noon comma day_of_week",
+    "text": "weekends at noon",
+    "mock": {
+      "minute": "0",
+      "hour": "12",
+      "day_of_month": "*",
+      "month": "*",
+      "day_of_week": "0,6",
+      "explanation": "At noon, Saturday and Sunday"
+    },
+    "expected": {
+      "status": 200,
+      "checks": [
+        {
+          "type": "cron",
+          "value": "0 12 * * 0,6"
+        },
+        {
+          "type": "warning",
+          "value": ""
+        }
+      ]
+    }
+  }
+]

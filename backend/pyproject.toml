@@ -1,0 +1,20 @@
+[project]
+name = "textcron"
+version = "1.0.0"
+description = "Natural language to cron schedule converter"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.0.0",
+    "litellm>=1.50.0",
+    "croniter>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "langfuse>=2.50.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0",
+    "httpx>=0.28",
+]

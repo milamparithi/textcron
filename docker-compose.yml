@@ -1,0 +1,60 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - LANGFUSE_HOST=http://langfuse:3000
+    depends_on:
+      - langfuse
+    networks:
+      - textcron-net
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - textcron-net
+
+  langfuse:
+    image: langfuse/langfuse:2
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
+      - NEXTAUTH_SECRET=change-me-to-a-random-string
+      - NEXTAUTH_URL=http://localhost:3000
+      - SALT=change-me-to-another-random-string
+      - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=false
+    networks:
+      - textcron-net
+
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=langfuse
+      - POSTGRES_PASSWORD=langfuse
+      - POSTGRES_DB=langfuse
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langfuse"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - textcron-net
+
+volumes:
+  pgdata:
+
+networks:
+  textcron-net:

@@ -1,0 +1,18 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+*.egg-info/
+
+# Local data
+pgdata/
+
+# LLM-as-Judge evaluation results
+eval_results/
+
+# OS files
+.DS_Store
+Thumbs.db
