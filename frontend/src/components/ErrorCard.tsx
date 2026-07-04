@@ -1,3 +1,4 @@
+/** Displays an error message with a "Try again" button. */
 export default function ErrorCard({
   message,
   onRetry,

@@ -8,12 +8,16 @@ router = APIRouter()
 
 
 class FeedbackRequest(BaseModel):
+    """User rating for a translation trace. Rating must be 'positive' or 'negative'."""
+
     trace_id: str
     rating: str  # "positive" | "negative"
     comment: str = ""
 
 
 class FeedbackResponse(BaseModel):
+    """Confirmation response containing the trace ID."""
+
     id: str
 
 
@@ -22,6 +26,7 @@ def submit_feedback(
     req: FeedbackRequest,
     _=Depends(guard.check_rate_limit),
 ):
+    """Submit a user rating (positive/negative) for a translation trace in Langfuse."""
     if not is_available():
         raise HTTPException(400, "Feedback requires Langfuse to be configured")
 

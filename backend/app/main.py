@@ -13,6 +13,7 @@ app.add_middleware(
 
 
 def _register_routers():
+    """Import and register API routers under /api prefix."""
     from app.api.translate import router as translate_router
     from app.api.validate import router as validate_router
     from app.api.feedback import router as feedback_router

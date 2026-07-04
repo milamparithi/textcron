@@ -3,6 +3,7 @@ import InputCard from "../components/InputCard";
 import ResultCard from "../components/ResultCard";
 import ErrorCard from "../components/ErrorCard";
 
+/** Page-level component: input card, result card (with next times + feedback), or error card. */
 export default function HomePage() {
   const { text, setText, loading, result, nextTimes, error, handleSubmit, handleClear } =
     useTranslate();

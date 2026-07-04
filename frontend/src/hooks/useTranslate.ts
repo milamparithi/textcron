@@ -2,6 +2,7 @@ import { useState } from "react";
 import { translate, validate } from "../api/cron";
 import type { TranslateResponse } from "../types/cron";
 
+/** State machine hook managing translate flow: text input, loading, result, next times, error. */
 export function useTranslate() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);

@@ -1,3 +1,4 @@
+/** Lists the next N scheduled execution times for a cron expression. */
 export default function NextTimes({ times }: { times: string[] }) {
   return (
     <div>

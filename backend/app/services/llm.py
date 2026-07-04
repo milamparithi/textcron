@@ -8,6 +8,8 @@ from litellm import completion
 
 @dataclass
 class LlmResult:
+    """Result of an LLM translation call, including parsed output and usage metadata."""
+
     parsed: dict[str, Any]
     model: str = ""
     prompt_tokens: int = 0
@@ -86,6 +88,7 @@ PROVIDER_TEMPERATURE_SUPPORT = {"openai", "azure", "gemini", "google", "anthropi
 
 
 def _resolve_model(provider: str, model: str) -> str:
+    """Prepend provider prefix (e.g. gemini/ ) for litellm compatibility."""
     prefix = PROVIDER_PREFIXES.get(provider, "")
     if prefix and not model.startswith(prefix):
         return prefix + model
@@ -93,6 +96,7 @@ def _resolve_model(provider: str, model: str) -> str:
 
 
 def _set_provider_env(provider: str):
+    """Set provider-specific env vars (e.g. GEMINI_API_KEY) from LLM_API_KEY."""
     api_key = os.getenv("LLM_API_KEY")
     if not api_key:
         return
@@ -105,6 +109,7 @@ def _set_provider_env(provider: str):
 
 
 def translate(text: str) -> LlmResult:
+    """Call the LLM to parse a natural language schedule into structured fields."""
     provider = os.getenv("LLM_PROVIDER", "openai").lower()
     model = _resolve_model(provider, os.getenv("LLM_MODEL", "gpt-4o-mini"))
     api_key = os.getenv("LLM_API_KEY") or None

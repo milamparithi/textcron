@@ -28,6 +28,7 @@ def _prune(store: dict | list, window: float):
 
 
 def check_rate_limit(request: Request):
+    """Enforce 30 req/min per IP and 100 req/day global using sliding window counters."""
     now = time.time()
     ip = request.client.host if request.client else "unknown"
 
@@ -64,6 +65,7 @@ REPEAT_THRESHOLD = 0.4  # reject if any single char >40% of input
 
 
 def validate_input(text: str) -> str:
+    """Pre-LLM input checks: non-empty, length ≤500, allowed chars, time keywords, gibberish detection."""
     stripped = text.strip()
 
     if not stripped:
@@ -102,18 +104,23 @@ MIN_INTERVAL_MINUTES = 5
 
 
 class LlmError(Exception):
+    """User-facing LLM error — the LLM identified an impossible/invalid/ambiguous schedule (400)."""
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(message)
 
 
 class LlmSystemError(Exception):
+    """System-level LLM error — response failed backend validation (502)."""
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(message)
 
 
 def validate_llm_output(result: dict) -> dict:
+    """Post-LLM validation: error field → 400, missing/out-of-range fields → 502."""
     error = result.get("error")
     if error:
         raise LlmError(str(error).strip())
@@ -140,6 +147,7 @@ def validate_llm_output(result: dict) -> dict:
 
 
 def check_cron_safety(cron_expr: str) -> str | None:
+    """Return a warning string if the expression fires more often than every 5 minutes."""
     if not is_valid(cron_expr):
         raise ValueError(f"Invalid cron expression: {cron_expr}")
 

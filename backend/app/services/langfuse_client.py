@@ -7,6 +7,7 @@ _available = False
 
 
 def get_client():
+    """Return the Langfuse singleton client, or a noop client if keys are missing."""
     global _lf, _available
     if _lf is not None:
         return _lf
@@ -28,11 +29,13 @@ def get_client():
 
 
 def is_available() -> bool:
+    """Check whether a real Langfuse client has been initialised."""
     get_client()
     return _available
 
 
 def create_trace(name: str, input: dict | None = None) -> str:
+    """Create a Langfuse trace via ingestion API. Returns trace ID (or empty string if unavailable)."""
     """Create a Langfuse trace via the direct ingestion API.
     Returns the trace ID (or empty string if Langfuse is unavailable)."""
     lf = get_client()
@@ -49,6 +52,23 @@ def create_trace(name: str, input: dict | None = None) -> str:
 
 
 def create_generation(
+    trace_id: str,
+    name: str,
+    model: str,
+    input_data: any = None,
+    output: any = None,
+    prompt_tokens: int = 0,
+    completion_tokens: int = 0,
+    total_tokens: int = 0,
+    input_cost: float = 0.0,
+    output_cost: float = 0.0,
+    total_cost: float = 0.0,
+    start_time: datetime | None = None,
+    end_time: datetime | None = None,
+    level: str = "DEFAULT",
+    status_message: str = "",
+):
+    """Record an LLM generation observation against a trace via ingestion API."""
     trace_id: str,
     name: str,
     model: str,
@@ -106,7 +126,7 @@ def create_generation(
 
 
 def score_trace(trace_id: str, name: str, value: float, comment: str = ""):
-    """Attach a score to an existing trace."""
+    """Attach a score (e.g. user rating) to an existing trace. Skips comment when empty."""
     lf = get_client()
     if not _available:
         return
@@ -118,6 +138,8 @@ def score_trace(trace_id: str, name: str, value: float, comment: str = ""):
 
 
 class _NoopClient:
+    """Stand-in client when Langfuse is not configured — all calls are no-ops."""
+
     def get_current_trace_id(self):
         return None
 
@@ -136,6 +158,7 @@ class _NoopClient:
 
 
 class _NoopAPI:
+    """Stand-in for Langfuse API client — returns empty ingestion responses."""
     class _Ingestion:
         def batch(self, **kwargs):
             from langfuse.api.ingestion.types.ingestion_response import IngestionResponse

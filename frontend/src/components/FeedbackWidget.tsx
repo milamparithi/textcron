@@ -6,6 +6,7 @@ type Props = {
 
 const STORAGE_PREFIX = "tc_feedback_";
 
+/** Thumbs up/down widget — auto-submits rating to Langfuse on click, prevents duplicates via sessionStorage. */
 export default function FeedbackWidget({ traceId }: Props) {
   const storageKey = STORAGE_PREFIX + traceId;
   const [done, setDone] = useState(false);

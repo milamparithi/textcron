@@ -13,6 +13,15 @@ pgdata/
 # LLM-as-Judge evaluation results
 eval_results/
 
+# Database artifacts
+*.db
+
+# Pytest cache
+.pytest_cache/
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
 # OS files
 .DS_Store
 Thumbs.db

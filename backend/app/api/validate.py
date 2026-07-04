@@ -8,6 +8,7 @@ router = APIRouter()
 
 @router.post("/validate", response_model=ValidateResponse)
 def validate(req: ValidateRequest):
+    """Validate a cron expression and return next scheduled times."""
     valid = cron.is_valid(req.cron)
     explanation = ""
     next_times = []

@@ -14,6 +14,7 @@ def translate(
     req: TranslateRequest,
     _=Depends(guard.check_rate_limit),
 ):
+    """Convert natural language schedule to a valid cron expression."""
     text = guard.validate_input(req.text)
 
     trace_id = create_trace(name="translate", input={"text": text})

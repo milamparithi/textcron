@@ -3,6 +3,7 @@ import CronBadge from "./CronBadge";
 import NextTimes from "./NextTimes";
 import FeedbackWidget from "./FeedbackWidget";
 
+/** Displays a successful translation result: cron badge, explanation, warning, next times, and feedback widget. */
 export default function ResultCard({
   result,
   nextTimes,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
+/** Monospaced, clickable cron expression badge — copies to clipboard on click. */
 export default function CronBadge({ cron }: { cron: string }) {
   const [copied, setCopied] = useState(false);
 

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+/** Page layout wrapper — centered single-column with header and footer. */
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto flex min-h-dvh max-w-xl flex-col px-4 py-8 sm:py-16">

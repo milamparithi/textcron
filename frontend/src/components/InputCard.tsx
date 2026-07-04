@@ -1,5 +1,6 @@
 import { useRef } from "react";
 
+/** Textarea input with submit button — Enter to submit, auto-growing, spinner during load. */
 export default function InputCard({
   value,
   onChange,
