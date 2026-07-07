@@ -6,7 +6,7 @@ Describe your schedule in plain English and get a valid cron expression.
 e.g. "every weekday at 3pm" → 0 15 * * 1-5
 ```
 
-This app agentically engineered using Spec Driven Development (SDD) and Behaviour Driven Development (BDD). While it's easy to directly ask an LLM for the required cron expression described in plain text, this app is developed to demonstrate how to use guardrails, evals and Observability to create robust AI powered applications. 
+This app is agentically engineered using Spec Driven Development (SDD) and Behaviour Driven Development (BDD). While it's easy to directly ask an LLM for the required cron expression described in plain text, this app is developed to demonstrate how to use guardrails, evals, golden dataset and observability to create robust AI powered applications. 
 
 ## Screenshots
 
